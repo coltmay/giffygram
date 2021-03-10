@@ -1,4 +1,4 @@
-import { getPosts } from "./data/DataManager.js";
+import { getPosts, usePostCollection } from "./data/DataManager.js";
 import { PostList } from "./feed/PostList.js";
 import { NavBar } from "./nav/NavBar.js";
 import { Footer } from "./nav/FooterBar.js";
@@ -57,14 +57,38 @@ const clickLogoutButton = () => {
     })
 }
 
-// Event for selecting the year in the footer.
-applicationElement.addEventListener("change", event => {
-    if (event.target.id === "yearSelection") {
-        const yearAsNumber = parseInt(event.target.value)
+const clickEditButton = () => {
+    applicationElement.addEventListener("click", (event) => {
+        if (event.target.id.startsWith("edit")) {
+            console.log("post clicked", event.target.id.split("--"))
+            console.log("the id is", event.target.id.split("--")[1])
+        }
+    })
+}
 
-        console.log(`User wants to see posts since ${yearAsNumber}`)
-    }
-})
+
+const showFilteredPosts = (year) => {
+    // Get a copy of the post collection
+    const epoch = Date.parse(`01/01/${year}`);
+    // Filter the date
+    const filteredData = usePostCollection().filter(singlePost => {
+        if (singlePost.timestamp >= epoch) {
+            return singlePost;
+        }
+    })
+    const postElement = document.querySelector(".postList");
+    postElement.innerHTML = PostList(filteredData);
+}
+
+// Event for selecting the year in the footer.
+const selectYear = () => {
+    applicationElement.addEventListener("change", event => {
+        if (event.target.id === "yearSelection") {
+            const yearAsNumber = parseInt(event.target.value)
+            showFilteredPosts(yearAsNumber);
+        }
+    })
+}
 
 const startGiffyGram = () => {
     showPostList();
@@ -73,6 +97,8 @@ const startGiffyGram = () => {
     clickHomeButton();
     clickMessageButton();
     clickLogoutButton();
+    clickEditButton();
+    selectYear();
 }
 
 startGiffyGram();
