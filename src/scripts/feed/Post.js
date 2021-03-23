@@ -8,6 +8,7 @@ export const Post = (postObject) => {
         <p class="post__description">${postObject.description}</p>
         <p class="post__details">Posted by User #${postObject.userId} on ${postObject.timestamp}</p>
         <div><button id="edit--${postObject.id}">Edit</button></div>
+        <div><button id="delete--${postObject.id}">Delete</button></div>
       </section>
     `
 }

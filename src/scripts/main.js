@@ -1,4 +1,4 @@
-import { getPosts, usePostCollection, createPost } from "./data/DataManager.js";
+import { getPosts, usePostCollection, createPost, deletePost } from "./data/DataManager.js";
 import { PostList } from "./feed/PostList.js";
 import { NavBar } from "./nav/NavBar.js";
 import { PostEntry } from "./feed/PostEntry.js";
@@ -59,9 +59,9 @@ applicationElement.addEventListener("click", event => {
 
         // be sure to import from the DataManager
         createPost(postObject)
-        .then(response => {
-            showPostList();
-        })
+            .then(response => {
+                showPostList();
+            })
     }
 })
 
@@ -127,6 +127,18 @@ const selectYear = () => {
         }
     })
 }
+
+// Event for deleting post.
+applicationElement.addEventListener("click", event => {
+    event.preventDefault();
+    if (event.target.id.startsWith("delete")) {
+        const postId = event.target.id.split("--")[1];
+        deletePost(postId)
+            .then(response => {
+                showPostList();
+            })
+    }
+})
 
 const startGiffyGram = () => {
     showPostList();
