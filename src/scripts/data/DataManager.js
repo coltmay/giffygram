@@ -12,7 +12,7 @@ export const getUsers = () => {
 }
 
 // An empty object that will hold the current logged in user.
-let loggedInUser = {}
+let loggedInUser = {};
 
 // Returns logged in user.
 export const getLoggedInUser = () => {
@@ -41,6 +41,22 @@ export const loginUser = (userObj) => {
                 return false;
             }
         })
+}
+
+export const registerUser = (userObj) => {
+    return fetch(`http://localhost:8088/users`, {
+    method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(userObj)
+    })
+    .then(response => response.json())
+    .then(parsedUser => {
+        console.log(parsedUser)
+        setLoggedInUser(parsedUser);
+        return getLoggedInUser();
+    })
 }
 /*===========================================
 ~~~~~~~~~~~~~~~~~~~~POSTS~~~~~~~~~~~~~~~~~~~~

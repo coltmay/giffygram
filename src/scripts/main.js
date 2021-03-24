@@ -1,6 +1,6 @@
 import {
     // User functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    getLoggedInUser, logoutUser, setLoggedInUser, loginUser,
+    getLoggedInUser, logoutUser, setLoggedInUser, loginUser, registerUser,
     // Post functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
     getPosts, getSinglePost, usePostCollection, createPost, updatePost, deletePost
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,10 +110,21 @@ const clickMessageButton = () => {
     })
 }
 
-// TODO Allows User To Register
+// Allows User To Register, Then Logs In Automatically
 const clickRegisterButton = () => {
     applicationElement.addEventListener("click", event => {
         event.preventDefault();
+        if (event.target.id === "register__submit") {
+            const userObj = {
+                name: document.querySelector("input[name='registerName']").value,
+                email: document.querySelector("input[name='registerEmail']").value
+            };
+            registerUser(userObj)
+                .then(dbUserObj => {
+                    sessionStorage.setItem("user", JSON.stringify(dbUserObj));
+                    startGiffyGram();
+                })
+        }
     })
 }
 
@@ -125,8 +136,7 @@ const clickLoginButton = () => {
             const userObj = {
                 name: document.querySelector("input[name='name']").value,
                 email: document.querySelector("input[name='email']").value
-            }
-            //! Will not work until loginUser is created
+            };
             loginUser(userObj)
                 .then(dbUserObj => {
                     if (dbUserObj) {
