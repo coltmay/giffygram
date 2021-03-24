@@ -3,17 +3,17 @@ export const PostEntry = () => {
     <div class="newPost">
         <div>
             <input value=""
-                   name="postTitle"
-                   class="newPost__input"
-                   type="text"
-                   placeholder="Title" />
+                name="postTitle"
+                class="newPost__input"
+                type="text"
+                placeholder="Title" />
         </div>
         <div>
             <input value=""
-                   name="postURL"
-                   class="newPost__input"
-                   type="text"
-                   placeholder="URL of gif" />
+                name="postURL"
+                class="newPost__input"
+                type="text"
+                placeholder="URL of gif" />
         </div>
 
         <textarea name="postDescription"
