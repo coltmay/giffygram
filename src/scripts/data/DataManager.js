@@ -31,7 +31,7 @@ export const setLoggedInUser = (userObj) => {
 
 // Checks if user is in database, then pulls and sets user.
 export const loginUser = (userObj) => {
-    return fetch (`http://localhost:8088/users?name=${userObj.name}&email=${userObj.email}`)
+    return fetch(`http://localhost:8088/users?name=${userObj.name}&email=${userObj.email}`)
         .then(response => response.json())
         .then(parsedUser => {
             if (parsedUser.length > 0) {
@@ -45,32 +45,47 @@ export const loginUser = (userObj) => {
 
 export const registerUser = (userObj) => {
     return fetch(`http://localhost:8088/users`, {
-    method: "POST",
+        method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(userObj)
     })
-    .then(response => response.json())
-    .then(parsedUser => {
-        console.log(parsedUser)
-        setLoggedInUser(parsedUser);
-        return getLoggedInUser();
-    })
+        .then(response => response.json())
+        .then(parsedUser => {
+            setLoggedInUser(parsedUser);
+            return getLoggedInUser();
+        })
 }
 /*===========================================
 ~~~~~~~~~~~~~~~~~~~~POSTS~~~~~~~~~~~~~~~~~~~~
 ===========================================*/
 let postCollection = [];
+let userFilteredPosts = [];
 
 export const getPosts = () => {
     // Besides fetching posts from the DB, we will also be fetching the embedded user data attached to each post with `expand=user`
     return fetch("http://localhost:8088/posts?_expand=user")
-    .then(response => response.json())
-    .then(parsedResponse => {
-        postCollection = parsedResponse;
-        return parsedResponse;
-    })
+        .then(response => response.json())
+        .then(parsedResponse => {
+            postCollection = parsedResponse;
+            return parsedResponse;
+        })
+}
+
+export const getCurrentUserPosts = (userObj) => {
+    debugger
+    return fetch("http://localhost:8088/posts?_expand=user")
+        .then(response => response.json())
+        .then(parsedResponse => {
+            parsedResponse.forEach(post => {
+                if (post.userId === userObj.id) {
+                    console.log(userFilteredPosts, post)
+                    userFilteredPosts.push(post);
+                }
+            })
+            return userFilteredPosts;
+        })
 }
 
 export const getSinglePost = (postId) => {

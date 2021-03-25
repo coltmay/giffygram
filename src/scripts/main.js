@@ -1,9 +1,9 @@
 import {
-    // User functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // User functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     getLoggedInUser, logoutUser, setLoggedInUser, loginUser, registerUser,
-    // Post functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
-    getPosts, getSinglePost, usePostCollection, createPost, updatePost, deletePost
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Post functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    getPosts, getSinglePost, usePostCollection, createPost, updatePost, deletePost, getCurrentUserPosts
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 } from "./data/DataManager.js";
 import { LoginForm } from "./auth/LoginForm.js";
 import { RegisterForm } from "./auth/RegisterForm.js";
@@ -37,8 +37,11 @@ const showPostEntry = () => {
 //* Displays All Posts In Database To DOM.
 const showPostList = () => {
     const postElement = document.querySelector(".postList");
+    // Fetches all of the posts in the database, then...
     getPosts()
+        // With all of those posts...
         .then((allPosts) => {
+            // It injects them into the HTML, after running the HTML conversion (PostList) on them, note they are reversed, to show newest first.
             postElement.innerHTML = PostList(allPosts.reverse());
         })
 }
@@ -54,19 +57,15 @@ const displayUpdatePost = () => {
     applicationElement.addEventListener("click", event => {
         event.preventDefault();
         if (event.target.id.startsWith("updatePost")) {
+            // Gets the id of the post by spliting the "__", this returns an array, the second item in said array holds the id that we want, hence index "1".
             const postId = event.target.id.split("__")[1];
-            // Collect all the details into an object
-            const title = document.querySelector("input[name='postTitle']").value
-            const url = document.querySelector("input[name='postURL']").value
-            const description = document.querySelector("textarea[name='postDescription']").value
-            const timestamp = document.querySelector("input[name='postTime']").value
-
+            // Collect all the details from the form into an object
             const postObject = {
-                title: title,
-                imageURL: url,
-                description: description,
+                title: document.querySelector("input[name='postTitle']").value,
+                imageURL: document.querySelector("input[name='postURL']").value,
+                description: document.querySelector("textarea[name='postDescription']").value,
                 userId: getLoggedInUser().id,
-                timestamp: parseInt(timestamp),
+                timestamp: parseInt(document.querySelector("input[name='postTime']").value),
                 id: parseInt(postId)
             }
 
@@ -217,6 +216,21 @@ const clickDeleteButton = () => {
     })
 }
 
+//* Allows Posts Only By Me Button To Display Only Posts User Has Created
+const clickMyPostsOnlyButton = () => {
+    const postElement = document.querySelector(".postList");
+    applicationElement.addEventListener("click", event => {
+        event.preventDefault();
+        if (event.target.id === "userPostButton") {
+            let currentUser = getLoggedInUser();
+            getCurrentUserPosts(currentUser)
+                .then(userfilteredArray => {
+                    postElement.innerHTML = PostList(userfilteredArray)
+                })
+        }
+    })
+}
+
 /*===========================================
 ~~~~~~~~~SELECTOR LISTENING FUNCTIONS~~~~~~~~
 ===========================================*/
@@ -259,6 +273,7 @@ const startGiffyGram = () => {
     clickEditButton();
     displayUpdatePost();
     clickDeleteButton();
+    clickMyPostsOnlyButton();
     selectYear();
 }
 
