@@ -1,26 +1,40 @@
-import { getPosts, getSinglePost, usePostCollection, createPost, deletePost, updatePost, getLoggedInUser } from "./data/DataManager.js";
+import {
+    // User functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    getLoggedInUser, logoutUser, setLoggedInUser, loginUser, registerUser,
+    // Post functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+    getPosts, getSinglePost, usePostCollection, createPost, updatePost, deletePost
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+} from "./data/DataManager.js";
+import { LoginForm } from "./auth/LoginForm.js";
+import { RegisterForm } from "./auth/RegisterForm.js";
 import { PostList } from "./feed/PostList.js";
 import { NavBar } from "./nav/NavBar.js";
 import { PostEntry } from "./feed/PostEntry.js";
 import { PostEdit } from "./feed/PostEdit.js";
 import { Footer } from "./nav/FooterBar.js";
 
-//  Defines application element on main, will be used for other elements via event bubbling
+/*===========================================
+~~~~~~~~~ELEMENT FOR EVENT LISTENERS~~~~~~~~~
+===========================================*/
+//* Defines application element on main, will be used for other elements via event bubbling
 const applicationElement = document.querySelector("main");
 
-// Display Navigation Bar
+/*===========================================
+~~~~~~~~~~~~~~~ELEMENT DISPLAYS~~~~~~~~~~~~~~
+===========================================*/
+//* Display Navigation Bar
 const showNavBar = () => {
     const navElement = document.querySelector("nav");
     navElement.innerHTML = NavBar();
 }
 
-// Display New Post Fields To DOM
+//* Display New Post Entry Form To DOM
 const showPostEntry = () => {
     const entryElement = document.querySelector(".entryForm");
     entryElement.innerHTML = PostEntry();
 }
 
-// Displays All Posts In Database To DOM.
+//* Displays All Posts In Database To DOM.
 const showPostList = () => {
     const postElement = document.querySelector(".postList");
     getPosts()
@@ -29,96 +43,19 @@ const showPostList = () => {
         })
 }
 
-// Display Footer Bar
-const showFooter = () => {
-    const footerElement = document.querySelector("footer");
-    footerElement.innerHTML = Footer();
-}
-
-// ! Allows Home Logo To Take User To Main Page
-const clickHomeButton = () => {
-    applicationElement.addEventListener("click", event => {
-        if (event.target.id === "homeButton") {
-            // Change later...
-            console.log("Home")
-        }
-    })
-}
-
-// ! Allows Pen Image To Take User To Messages
-const clickMessageButton = () => {
-    applicationElement.addEventListener("click", event => {
-        if (event.target.id === "directMessageIcon") {
-            // Change later...
-            console.log("Message")
-        }
-    })
-}
-
-// ! Allows User To Logout Via Logout Link
-const clickLogoutButton = () => {
-    applicationElement.addEventListener("click", event => {
-        if (event.target.id === "logout") {
-            // Change later...
-            console.log("Logout")
-        }
-    })
-}
-
-// Allows Submit Button To Add Post To Database and Display
-const clickSubmitButton = () => {
-    applicationElement.addEventListener("click", event => {
-        event.preventDefault();
-        if (event.target.id === "newPost__submit") {
-            //collect the input values into an object to post to the DB
-            const title = document.querySelector("input[name='postTitle']").value
-            const url = document.querySelector("input[name='postURL']").value
-            const description = document.querySelector("textarea[name='postDescription']").value
-            //we have not created a user yet - for now, we will hard code `1`.
-            //we can add the current time as well
-            const postObject = {
-                title: title,
-                imageURL: url,
-                description: description,
-                userId: 1,
-                timestamp: Date.now()
-            }
-            // be sure to import from the DataManager
-            createPost(postObject)
-                .then(response => {
-                    showPostList();
-                })
-        }
-    })
-}
-
-// Allows Edit Button To Edit Post Holding Button
-const clickEditButton = () => {
-    applicationElement.addEventListener("click", event => {
-        event.preventDefault();
-        if (event.target.id.startsWith("edit")) {
-            const postId = event.target.id.split("--")[1];
-            getSinglePost(postId)
-                .then(response => {
-                    showEdit(response);
-                })
-        }
-    })
-}
-
-// Function That Displays The Edit Form
+//* Displays The Edit Form
 const showEdit = (postObj) => {
     const entryElement = document.querySelector(".entryForm");
     entryElement.innerHTML = PostEdit(postObj);
 }
 
-// Displays The Updated Post List From Database, After Editing
+//* Displays The Updated Post List From Database, After Editing
 const displayUpdatePost = () => {
     applicationElement.addEventListener("click", event => {
         event.preventDefault();
         if (event.target.id.startsWith("updatePost")) {
             const postId = event.target.id.split("__")[1];
-            //collect all the details into an object
+            // Collect all the details into an object
             const title = document.querySelector("input[name='postTitle']").value
             const url = document.querySelector("input[name='postURL']").value
             const description = document.querySelector("textarea[name='postDescription']").value
@@ -143,7 +80,130 @@ const displayUpdatePost = () => {
     })
 }
 
-// Allows Delete Button To Delete Post Holding Button.
+//* Display Footer Bar
+const showFooter = () => {
+    const footerElement = document.querySelector("footer");
+    footerElement.innerHTML = Footer();
+}
+
+
+/*===========================================
+~~~~~~~~~~BUTTON LISTENING FUNCTIONS~~~~~~~~~
+===========================================*/
+// TODO Allows Home Logo To Take User To Main Page
+const clickHomeButton = () => {
+    applicationElement.addEventListener("click", event => {
+        if (event.target.id === "homeButton") {
+            // todo Change later...
+            console.log("Home")
+        }
+    })
+}
+
+// TODO Allows Pen Image To Take User To Messages
+const clickMessageButton = () => {
+    applicationElement.addEventListener("click", event => {
+        if (event.target.id === "directMessageIcon") {
+            // todo Change later...
+            console.log("Message")
+        }
+    })
+}
+
+// Allows User To Register, Then Logs In Automatically
+const clickRegisterButton = () => {
+    applicationElement.addEventListener("click", event => {
+        event.preventDefault();
+        if (event.target.id === "register__submit") {
+            const userObj = {
+                name: document.querySelector("input[name='registerName']").value,
+                email: document.querySelector("input[name='registerEmail']").value
+            };
+            registerUser(userObj)
+                .then(dbUserObj => {
+                    sessionStorage.setItem("user", JSON.stringify(dbUserObj));
+                    startGiffyGram();
+                })
+        }
+    })
+}
+
+//* Allows User To Login Via Login Button
+const clickLoginButton = () => {
+    applicationElement.addEventListener("click", event => {
+        event.preventDefault();
+        if (event.target.id === "login__submit") {
+            const userObj = {
+                name: document.querySelector("input[name='name']").value,
+                email: document.querySelector("input[name='email']").value
+            };
+            loginUser(userObj)
+                .then(dbUserObj => {
+                    if (dbUserObj) {
+                        sessionStorage.setItem("user", JSON.stringify(dbUserObj));
+                        startGiffyGram();
+                    } else {
+                        const entryElement = document.querySelector(".entryForm");
+                        entryElement.innerHTML = `<p class="center">That user does not exist. Please try again or register for your free account.</p>
+                                                    ${LoginForm()} <hr/> <hr/> ${RegisterForm()}`;
+                    }
+                })
+        }
+    })
+}
+
+//* Allows User To Logout Via Logout Link
+const clickLogoutButton = () => {
+    applicationElement.addEventListener("click", event => {
+        if (event.target.id === "logout") {
+            logoutUser();
+            sessionStorage.clear();
+            checkForUser();
+        }
+    })
+}
+
+//* Allows Submit Button To Add Post To Database and Display
+const clickSubmitButton = () => {
+    applicationElement.addEventListener("click", event => {
+        event.preventDefault();
+        if (event.target.id === "newPost__submit") {
+            //collect the input values into an object to post to the DB
+            const title = document.querySelector("input[name='postTitle']").value
+            const url = document.querySelector("input[name='postURL']").value
+            const description = document.querySelector("textarea[name='postDescription']").value
+            const postObject = {
+                title: title,
+                imageURL: url,
+                description: description,
+                //! Test code, was previously a hard coded 1.
+                userId: getLoggedInUser().id,
+                timestamp: Date.now()
+            }
+            createPost(postObject)
+                .then(response => {
+                    showPostList();
+                })
+        }
+    })
+}
+
+//* Allows Edit Button To Edit Post Holding Button
+const clickEditButton = () => {
+    applicationElement.addEventListener("click", event => {
+        event.preventDefault();
+        if (event.target.id.startsWith("edit")) {
+            const postId = event.target.id.split("--")[1];
+            getSinglePost(postId)
+                .then(response => {
+                    showEdit(response);
+                })
+        }
+    })
+}
+
+
+//* Allows Delete Button To Delete Post Holding Button.
 const clickDeleteButton = () => {
     applicationElement.addEventListener("click", event => {
         event.preventDefault();
@@ -157,7 +217,10 @@ const clickDeleteButton = () => {
     })
 }
 
-// A simple event that listens for a year selection, then invokes showFilteredPosts
+/*===========================================
+~~~~~~~~~SELECTOR LISTENING FUNCTIONS~~~~~~~~
+===========================================*/
+//* Listens for a year selection in footer, then invokes showFilteredPosts
 const selectYear = () => {
     applicationElement.addEventListener("change", event => {
         if (event.target.id === "yearSelection") {
@@ -167,7 +230,7 @@ const selectYear = () => {
     })
 }
 
-// Filters all posts by year selected from selectYear.
+//* Filters all posts by year selected from selectYear.
 const showFilteredPosts = (year) => {
     // Get a copy of the post collection
     const epoch = Date.parse(`01/01/${year}`);
@@ -181,7 +244,9 @@ const showFilteredPosts = (year) => {
     postElement.innerHTML = PostList(filteredData);
 }
 
-
+/*===========================================
+~~~~~~~~~~~~~~~~~~~STARTUP~~~~~~~~~~~~~~~~~~~
+===========================================*/
 const startGiffyGram = () => {
     showNavBar();
     showPostEntry();
@@ -197,4 +262,28 @@ const startGiffyGram = () => {
     selectYear();
 }
 
-startGiffyGram();
+//* Checks Session ID for User, if not, prompts Login/Register
+const checkForUser = () => {
+    if (sessionStorage.getItem("user")) {
+        setLoggedInUser(JSON.parse(sessionStorage.getItem("user")));
+
+        startGiffyGram();
+    } else {
+        clickRegisterButton();
+        clickLoginButton();
+        showLoginRegister();
+    }
+}
+
+// Displays Login and Register Page, Invoked By checkForUser
+const showLoginRegister = () => {
+    showNavBar();
+    const entryElement = document.querySelector(".entryForm")
+
+    entryElement.innerHTML = `${LoginForm()} <hr/> <hr/> ${RegisterForm()}`;
+
+    const postElement = document.querySelector(".postList");
+    postElement.innerHTML = "";
+}
+
+checkForUser();
