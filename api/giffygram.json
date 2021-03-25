@@ -1,9 +1,14 @@
 {
   "users": [
     {
-      "name": "Colten",
-      "email": "colten@email.com",
+      "name": "colten",
+      "email": "colten_mayberry@email.com",
       "id": 1
+    },
+    {
+      "name": "tanner",
+      "email": "tanner_mayberry@email.com",
+      "id": 2
     }
   ],
   "posts": [
