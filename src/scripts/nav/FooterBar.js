@@ -3,6 +3,7 @@ export const Footer = () => {
     // HTML to be returned to GiffyGram component
     return `
         <footer class="footer">
+            <button id="userPostButton">Posts Only By Me</button>
             <div class="footer__item">
                 Posts since <select id="yearSelection">
                     <option>2020</option>

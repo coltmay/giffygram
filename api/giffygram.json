@@ -27,6 +27,14 @@
       "userId": 1,
       "timestamp": 1616527437700,
       "id": 2
+    },
+    {
+      "title": "test",
+      "imageURL": "https://media.giphy.com/media/wTILzUdd0L72RtE37U/giphy.gif",
+      "description": "test",
+      "userId": 2,
+      "timestamp": 1616696219720,
+      "id": 3
     }
   ],
   "messages": []
