@@ -116,8 +116,8 @@ const clickRegisterButton = () => {
         event.preventDefault();
         if (event.target.id === "register__submit") {
             const userObj = {
-                name: document.querySelector("input[name='registerName']").value,
-                email: document.querySelector("input[name='registerEmail']").value
+                name: document.querySelector("input[name='registerName']").value.toLowerCase(),
+                email: document.querySelector("input[name='registerEmail']").value.toLowerCase()
             };
             registerUser(userObj)
                 .then(dbUserObj => {
@@ -134,8 +134,8 @@ const clickLoginButton = () => {
         event.preventDefault();
         if (event.target.id === "login__submit") {
             const userObj = {
-                name: document.querySelector("input[name='name']").value,
-                email: document.querySelector("input[name='email']").value
+                name: document.querySelector("input[name='name']").value.toLowerCase(),
+                email: document.querySelector("input[name='email']").value.toLowerCase()
             };
             loginUser(userObj)
                 .then(dbUserObj => {

@@ -64,7 +64,8 @@ export const registerUser = (userObj) => {
 let postCollection = [];
 
 export const getPosts = () => {
-    return fetch("http://localhost:8088/posts")
+    // Besides fetching posts from the DB, we will also be fetching the embedded user data attached to each post with `expand=user`
+    return fetch("http://localhost:8088/posts?_expand=user")
     .then(response => response.json())
     .then(parsedResponse => {
         postCollection = parsedResponse;
